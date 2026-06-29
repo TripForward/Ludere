@@ -36,6 +36,9 @@
     <!-- Should we display a virtual gamepad? -->
     <bool name="config_gamepad">true</bool>
 
+    <!-- Force touchscreen gamepad even when physical gamepads are connected (for template/auto-generator) -->
+    <bool name="config_force_touch_gamepad">false</bool>
+
     <!-- Should we vibrate on touch? -->
     <bool name="config_gamepad_haptic">true</bool>
 
@@ -51,4 +54,10 @@
 
     <!-- Should the left DPAD be replaced with an analog stick? -->
     <bool name="config_left_analog">false</bool>
+
+    <!-- C-button visibility flags (for template/auto-generator UI placement) -->
+    <bool name="config_gamepad_c_up">false</bool>
+    <bool name="config_gamepad_c_down">false</bool>
+    <bool name="config_gamepad_c_left">false</bool>
+    <bool name="config_gamepad_c_right">false</bool>
 </resources>
