@@ -54,6 +54,12 @@ class GamePadConfig(
             label = "Y"
         )
 
+        // C-buttons mapping for on-screen layout (use available keycodes)
+        val BUTTON_C_UP = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_THUMBR, label = "CU")
+        val BUTTON_C_DOWN = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_THUMBL, label = "CD")
+        val BUTTON_C_LEFT = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_L2, label = "CL")
+        val BUTTON_C_RIGHT = ButtonConfig(id = KeyEvent.KEYCODE_BUTTON_R2, label = "CR")
+
         val LEFT_DPAD = PrimaryDialConfig.Cross(CrossConfig(0))
         val LEFT_ANALOG = PrimaryDialConfig.Stick(0)
     }
@@ -89,7 +95,14 @@ class GamePadConfig(
             )
         ),
         secondaryDials = listOfNotNull(
+            // R1 / shoulders
             SecondaryDialConfig.SingleButton(2, 1, BUTTON_R1).takeIf { resources.getBoolean(R.bool.config_gamepad_r1) },
+            // Map C-buttons to visible secondary sockets (tweak socket numbers to adjust on-screen position)
+            SecondaryDialConfig.SingleButton(3, 1, BUTTON_C_UP).takeIf { resources.getBoolean(R.bool.config_gamepad_c_up) },
+            SecondaryDialConfig.SingleButton(5, 1, BUTTON_C_DOWN).takeIf { resources.getBoolean(R.bool.config_gamepad_c_down) },
+            SecondaryDialConfig.SingleButton(7, 1, BUTTON_C_LEFT).takeIf { resources.getBoolean(R.bool.config_gamepad_c_left) },
+            SecondaryDialConfig.SingleButton(9, 1, BUTTON_C_RIGHT).takeIf { resources.getBoolean(R.bool.config_gamepad_c_right) },
+            // Start button
             SecondaryDialConfig.SingleButton(8, 1, BUTTON_START).takeIf { resources.getBoolean(R.bool.config_gamepad_start) },
         )
     )
