@@ -16,7 +16,7 @@
     <bool name="config_load_bytes">false</bool>
 
     <!-- Core variables (key=value comma separated) - add parallel_n64 specific options here -->
-    <string name="config_variables"></string>
+    <string name="config_variables">input_libretro_device_p1=257</string>
 
     <!-- Presentation -->
     <integer name="config_fast_forward_multiplier">2</integer>
