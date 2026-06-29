@@ -5,6 +5,7 @@ import android.view.KeyEvent
 import android.view.MotionEvent
 import com.draco.ludere.retroview.RetroView
 import com.swordfish.libretrodroid.GLRetroView
+import kotlin.math.abs
 
 class ControllerInput {
     companion object {
@@ -25,6 +26,11 @@ class ControllerInput {
             KeyEvent.KEYCODE_BACK,
             KeyEvent.KEYCODE_POWER
         )
+
+        /**
+         * Dead zone threshold for analog sticks to filter out drift
+         */
+        private const val ANALOG_DEAD_ZONE = 0.2f
     }
     /**
      * Set of keys currently being held by the user
@@ -48,6 +54,13 @@ class ControllerInput {
     private fun checkMenuKeyCombo() {
         if (keyLog == KEYCOMBO_MENU)
             menuCallback()
+    }
+
+    /**
+     * Apply dead zone filtering to analog stick values
+     */
+    private fun applyDeadZone(value: Float): Float {
+        return if (abs(value) < ANALOG_DEAD_ZONE) 0f else value
     }
 
     fun processKeyEvent(keyCode: Int, event: KeyEvent, retroView: RetroView): Boolean? {
@@ -88,14 +101,14 @@ class ControllerInput {
             )
             sendMotionEvent(
                 GLRetroView.MOTION_SOURCE_ANALOG_LEFT,
-                event.getAxisValue(MotionEvent.AXIS_X),
-                event.getAxisValue(MotionEvent.AXIS_Y),
+                applyDeadZone(event.getAxisValue(MotionEvent.AXIS_X)),
+                applyDeadZone(event.getAxisValue(MotionEvent.AXIS_Y)),
                 port
             )
             sendMotionEvent(
                 GLRetroView.MOTION_SOURCE_ANALOG_RIGHT,
-                event.getAxisValue(MotionEvent.AXIS_Z),
-                event.getAxisValue(MotionEvent.AXIS_RZ),
+                applyDeadZone(event.getAxisValue(MotionEvent.AXIS_Z)),
+                applyDeadZone(event.getAxisValue(MotionEvent.AXIS_RZ)),
                 port
             )
         }
