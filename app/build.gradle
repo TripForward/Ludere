@@ -1,33 +1,37 @@
 plugins {
-    id('com.android.application')
-    id('kotlin-android')
+    id 'com.android.application'
+    id 'kotlin-android'
 }
 
+apply plugin: 'de.undercouch.download'
+
 def configValue = { id ->
-    return new XmlParser()
-        .parse(file("${rootProject.projectDir.path}/app/src/main/res/values/config.xml"))
-        .string.find { it.@name.equals id }.text()
+    new XmlParser()
+            .parse(file("${rootProject.projectDir}/app/src/main/res/values/config.xml"))
+            .string
+            .find { it.@name == id }
+            .text()
 }
 
 android {
     compileSdkVersion 31
-    buildToolsVersion '30.0.3'
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "com.draco.ludere.${configValue('config_id')}"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1
-        versionName '1.0'
-        resConfigs 'en'
+        versionName "1.0"
+        resConfigs "en"
     }
 
     signingConfigs {
         release {
             storeFile file("${rootProject.projectDir}/ludere.jks")
-            storePassword 'ludere'
-            keyAlias 'key0'
-            keyPassword 'ludere'
+            storePassword "ludere"
+            keyAlias "key0"
+            keyPassword "ludere"
         }
     }
 
@@ -35,7 +39,8 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
+                    'proguard-rules.pro'
             signingConfig signingConfigs.release
         }
     }
@@ -43,7 +48,7 @@ android {
     splits {
         abi {
             enable true
-            include 'armeabi-v7a', 'arm64-v8a'
+            include "armeabi-v7a", "arm64-v8a"
             universalApk true
         }
     }
@@ -56,53 +61,62 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = "1.8"
     }
 }
 
 task prepareCore {
     doLast {
-        for (abi in ['armeabi-v7a', 'arm64-v8a']) {
-            var jniAbiFolder = file("${rootProject.projectDir}/app/src/main/jniLibs/$abi")
+        ['armeabi-v7a', 'arm64-v8a'].each { abi ->
 
-            if (jniAbiFolder.exists() && jniAbiFolder.list().length > 0)
-                continue
+            def jniAbiFolder = file("${rootProject.projectDir}/app/src/main/jniLibs/$abi")
 
-            jniAbiFolder.mkdirs()
-
-            download {
-                src "https://buildbot.libretro.com/nightly/android/latest/\( {abi}/ \){configValue('config_core')}_libretro_android.so.zip"
-                dest "${rootProject.projectDir}/app/src/main/jniLibs/$abi"
+            if (!jniAbiFolder.exists()) {
+                jniAbiFolder.mkdirs()
             }
-            copy {
-                from zipTree("${rootProject.projectDir}/app/src/main/jniLibs/\( abi/ \){configValue('config_core')}_libretro_android.so.zip")
-                into "${rootProject.projectDir}/app/src/main/jniLibs/$abi"
-                rename "${configValue('config_core')}_libretro_android.so", "libcore.so"
-            }
-            delete {
-                delete "${rootProject.projectDir}/app/src/main/jniLibs/\( abi/ \){configValue('config_core')}_libretro_android.so.zip"
+
+            def zipFile = file("${jniAbiFolder}/${configValue('config_core')}_libretro_android.so.zip")
+
+            if (!file("${jniAbiFolder}/libcore.so").exists()) {
+
+                download {
+                    src "https://buildbot.libretro.com/nightly/android/latest/${abi}/${configValue('config_core')}_libretro_android.so.zip"
+                    dest zipFile
+                    overwrite false
+                }
+
+                copy {
+                    from zipTree(zipFile)
+                    into jniAbiFolder
+                    rename("${configValue('config_core')}_libretro_android.so", "libcore.so")
+                }
+
+                delete zipFile
             }
         }
     }
 }
+
 preBuild.dependsOn prepareCore
 
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: "libs", include: ["*.jar"])
+
     implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt'
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.1-native-mt"
 
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.0'
+    implementation "androidx.core:core-ktx:1.7.0"
+    implementation "androidx.appcompat:appcompat:1.4.0"
 
-    implementation 'androidx.activity:activity-ktx:1.4.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.4.0'
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.4.0'
+    implementation "androidx.activity:activity-ktx:1.4.0"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-livedata-ktx:2.4.0"
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:2.4.0"
 
-    implementation 'com.github.swordfish90:radialgamepad:0.6.0'
-    implementation 'com.github.swordfish90:libretrodroid:0.6.2'
+    implementation "com.github.swordfish90:radialgamepad:0.6.0"
+    implementation "com.github.swordfish90:libretrodroid:0.6.2"
 
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation "io.reactivex.rxjava2:rxandroid:2.1.1"
 }
