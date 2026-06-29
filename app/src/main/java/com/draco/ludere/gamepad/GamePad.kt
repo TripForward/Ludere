@@ -10,6 +10,7 @@ import android.util.Log
 import android.view.Display
 import android.view.InputDevice
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.draco.ludere.R
 import com.swordfish.libretrodroid.GLRetroView
@@ -24,6 +25,7 @@ class GamePad(
     padConfig: RadialGamePadConfig,
 ) {
     val pad = RadialGamePad(padConfig, 0f, context)
+    private val appContext = context
 
     companion object {
         private const val TAG = "GamePad"
@@ -124,19 +126,31 @@ class GamePad(
      */
     fun subscribe(compositeDisposable: CompositeDisposable, retroView: GLRetroView) {
         Log.d(TAG, "Subscribing touch gamepad to RetroView")
+        Toast.makeText(appContext, "GamePad Subscribe Called", Toast.LENGTH_SHORT).show()
         
-        val inputDisposable = pad.events().subscribe(
-            { event ->
-                Log.d(TAG, "Pad event fired: $event")
-                eventHandler(event, retroView)
-            },
-            { error ->
-                Log.e(TAG, "Error in pad events", error)
-            },
-            {
-                Log.d(TAG, "Pad events completed")
-            }
-        )
-        compositeDisposable.add(inputDisposable)
+        try {
+            val eventStream = pad.events()
+            Log.d(TAG, "Got event stream: $eventStream")
+            
+            val inputDisposable = eventStream.subscribe(
+                { event ->
+                    Log.d(TAG, "Pad event fired: $event")
+                    Toast.makeText(appContext, "GamePad Event: $event", Toast.LENGTH_SHORT).show()
+                    eventHandler(event, retroView)
+                },
+                { error ->
+                    Log.e(TAG, "Error in pad events", error)
+                    Toast.makeText(appContext, "GamePad Error: ${error.message}", Toast.LENGTH_SHORT).show()
+                },
+                {
+                    Log.d(TAG, "Pad events completed")
+                }
+            )
+            compositeDisposable.add(inputDisposable)
+            Log.d(TAG, "Successfully subscribed to pad events")
+        } catch (e: Exception) {
+            Log.e(TAG, "Exception while subscribing", e)
+            Toast.makeText(appContext, "Subscribe Exception: ${e.message}", Toast.LENGTH_LONG).show()
+        }
     }
 }
