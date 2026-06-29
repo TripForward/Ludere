@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- parallel_n64 touchscreen-first auto-generation template
+         Use this file when auto-generating N64 builds. Actions should copy/merge this
+         into res/values/config.xml (or replace it) at build time.
+
+         This template enables on-screen controls and exposes C-buttons on the
+         touch gamepad. Tweak labels/flags below as needed for a specific ROM. -->
+
+    <!-- Core / app identifiers -->
+    <string name="config_id">n64_parallel_template</string>
+    <string name="config_name">Nintendo 64 (parallel_n64)</string>
+    <string name="config_core">parallel_n64</string>
+
+    <!-- Load ROM from memory? Leave false for large ROMs -->
+    <bool name="config_load_bytes">false</bool>
+
+    <!-- Core variables (key=value comma separated) - add parallel_n64 specific options here -->
+    <string name="config_variables"></string>
+
+    <!-- Presentation -->
+    <integer name="config_fast_forward_multiplier">2</integer>
+    <bool name="config_fullscreen">true</bool>
+    <integer name="config_orientation">2</integer>
+
+    <!-- Make this touchscreen-first: show virtual gamepad even when controllers are present -->
+    <bool name="config_gamepad">true</bool>
+    <bool name="config_force_touch_gamepad">true</bool>
+    <bool name="config_gamepad_haptic">true</bool>
+
+    <!-- On-screen gamepad layout tuned for N64
+         We enable four primary buttons on the right (A/B/X/Y) so C-buttons can be mapped
+         to visible on-screen buttons via your generator or by remapping the ButtonConfig ids. -->
+    <bool name="config_gamepad_a">true</bool>
+    <bool name="config_gamepad_b">true</bool>
+    <bool name="config_gamepad_x">true</bool>
+    <bool name="config_gamepad_y">true</bool>
+    <bool name="config_gamepad_start">true</bool>
+    <bool name="config_gamepad_select">true</bool>
+    <bool name="config_gamepad_l1">true</bool>
+    <bool name="config_gamepad_r1">true</bool>
+
+    <!-- Treat left primary as analog stick (recommended for N64 joystick) -->
+    <bool name="config_left_analog">true</bool>
+
+    <!-- C-button visibility flags (for generator scripts / UI placement) -->
+    <bool name="config_gamepad_c_up">true</bool>
+    <bool name="config_gamepad_c_down">true</bool>
+    <bool name="config_gamepad_c_left">true</bool>
+    <bool name="config_gamepad_c_right">true</bool>
+
+    <!-- Input preset name your generator/actions can use to pick default keymaps -->
+    <string name="config_input_preset">n64_touch_default</string>
+</resources>
