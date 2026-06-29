@@ -63,6 +63,11 @@ prepare_env() {
 	do
 		mkdir -p "$OUTPUT_DIR/$abi"
 	done
+
+	# Clean up conflicting resource files to prevent duplicate resource errors
+	log "Removing conflicting resource files to prevent build failures..."
+	rm -f "$RES_DIR/values/config_parallel_n64.xml"
+	rm -f "$RES_DIR/values/config_*.xml"
 }
 
 # Build one package
