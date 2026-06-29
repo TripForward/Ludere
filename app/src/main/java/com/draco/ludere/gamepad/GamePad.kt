@@ -87,18 +87,33 @@ class GamePad(
      * Send inputs to the RetroView
      */
     private fun eventHandler(event: Event, retroView: GLRetroView) {
+        Log.d(TAG, "EventHandler received: $event")
+        
         when (event) {
-            is Event.Button -> retroView.sendKeyEvent(event.action, event.id)
+            is Event.Button -> {
+                Log.d(TAG, "Button Event - Action: ${event.action}, ID: ${event.id}")
+                retroView.sendKeyEvent(event.action, event.id)
+            }
             is Event.Direction -> {
                 val filteredX = applyDeadZone(event.xAxis)
                 val filteredY = applyDeadZone(event.yAxis)
                 
-                Log.d(TAG, "Touch Gamepad Event - ID: ${event.id}, Raw: (${event.xAxis}, ${event.yAxis}), Filtered: ($filteredX, $filteredY)")
+                Log.d(TAG, "Direction Event - ID: ${event.id}, Raw: (${event.xAxis}, ${event.yAxis}), Filtered: ($filteredX, $filteredY)")
                 
                 when (event.id) {
-                    GLRetroView.MOTION_SOURCE_DPAD -> retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_DPAD, filteredX, filteredY)
-                    GLRetroView.MOTION_SOURCE_ANALOG_LEFT -> retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_ANALOG_LEFT, filteredX, filteredY)
-                    GLRetroView.MOTION_SOURCE_ANALOG_RIGHT -> retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_ANALOG_RIGHT, filteredX, filteredY)
+                    GLRetroView.MOTION_SOURCE_DPAD -> {
+                        Log.d(TAG, "Sending DPAD motion event")
+                        retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_DPAD, filteredX, filteredY)
+                    }
+                    GLRetroView.MOTION_SOURCE_ANALOG_LEFT -> {
+                        Log.d(TAG, "Sending ANALOG_LEFT motion event")
+                        retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_ANALOG_LEFT, filteredX, filteredY)
+                    }
+                    GLRetroView.MOTION_SOURCE_ANALOG_RIGHT -> {
+                        Log.d(TAG, "Sending ANALOG_RIGHT motion event")
+                        retroView.sendMotionEvent(GLRetroView.MOTION_SOURCE_ANALOG_RIGHT, filteredX, filteredY)
+                    }
+                    else -> Log.w(TAG, "Unknown motion source ID: ${event.id}")
                 }
             }
         }
@@ -108,9 +123,20 @@ class GamePad(
      * Register input events to the RetroView
      */
     fun subscribe(compositeDisposable: CompositeDisposable, retroView: GLRetroView) {
-        val inputDisposable = pad.events().subscribe {
-            eventHandler(it, retroView)
-        }
+        Log.d(TAG, "Subscribing touch gamepad to RetroView")
+        
+        val inputDisposable = pad.events().subscribe(
+            { event ->
+                Log.d(TAG, "Pad event fired: $event")
+                eventHandler(event, retroView)
+            },
+            { error ->
+                Log.e(TAG, "Error in pad events", error)
+            },
+            {
+                Log.d(TAG, "Pad events completed")
+            }
+        )
         compositeDisposable.add(inputDisposable)
     }
 }
