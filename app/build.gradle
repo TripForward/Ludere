@@ -75,14 +75,17 @@ tasks.register('prepareCore') {
 
             var zipFile = file("${rootProject.projectDir}/app/src/main/jniLibs/${abi}/${configValue('config_core')}_libretro_android.so.zip")
 
-            // Download file and ignore 404 errors safely
-            download.run {
-                src "https://buildbot.libretro.com/nightly/android/latest/${abi}/${configValue('config_core')}_libretro_android.so.zip"
-                dest "${rootProject.projectDir}/app/src/main/jniLibs/${abi}"
-                ignoreErrors true
+            // Wrap the download in a try-catch to bypass any architecture 404 errors safely
+            try {
+                download.run {
+                    src "https://buildbot.libretro.com/nightly/android/latest/${abi}/${configValue('config_core')}_libretro_android.so.zip"
+                    dest "${rootProject.projectDir}/app/src/main/jniLibs/${abi}"
+                }
+            } catch (Exception e) {
+                println "Skipping ${abi} - Core not found on buildbot: ${e.getMessage()}"
             }
 
-            // Only extract if the file was found and downloaded successfully
+            // Only extract if the file was successfully downloaded
             if (zipFile.exists()) {
                 copy {
                     from zipTree(zipFile)
@@ -90,8 +93,6 @@ tasks.register('prepareCore') {
                     rename "${configValue('config_core')}_libretro_android.so", "libcore.so"
                 }
                 delete zipFile
-            } else {
-                println "Skipping ${abi} - architecture core package not found on Libretro servers."
             }
         }
     }
