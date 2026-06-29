@@ -43,7 +43,7 @@ android {
     splits {
         abi {
             enable true
-            include 'armeabi-v7a', 'arm64-v8a'   // Only ARM - fixes x86 404 errors
+            include 'armeabi-v7a', 'arm64-v8a'
             universalApk true
         }
     }
@@ -63,7 +63,7 @@ android {
 
 task prepareCore {
     doLast {
-        for (abi in ['armeabi-v7a', 'arm64-v8a']) {   // Only ARM ABIs
+        for (abi in ['armeabi-v7a', 'arm64-v8a']) {
             var jniAbiFolder = file("${rootProject.projectDir}/app/src/main/jniLibs/$abi")
 
             if (jniAbiFolder.exists() && jniAbiFolder.list().length > 0)
@@ -72,7 +72,7 @@ task prepareCore {
             jniAbiFolder.mkdirs()
 
             download {
-                src "https://buildbot.libretro.com/nightly/android/latest/\( abi/ \){configValue('config_core')}_libretro_android.so.zip"
+                src "https://buildbot.libretro.com/nightly/android/latest/\( {abi}/ \){configValue('config_core')}_libretro_android.so.zip"
                 dest "${rootProject.projectDir}/app/src/main/jniLibs/$abi"
             }
             copy {
